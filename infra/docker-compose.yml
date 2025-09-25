@@ -1,0 +1,57 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: currency_alert
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - mail
+
+  data-provider:
+    build: ../data-provider
+    env_file: ../data-provider/.env.dev
+    depends_on:
+      - postgres
+      - rabbitmq
+      - mailhog
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+      - mail
+
+  data-gatherer:
+    build: ../data-gatherer
+    env_file: ../data-gatherer/.env.dev
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+
+volumes:
+  pgdata: {}
+
+networks:
+  backend:
+  mail:
