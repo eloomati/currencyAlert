@@ -2,13 +2,13 @@ services:
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_DB: currencyalert
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./init/01-create-dbs.sql:/docker-entrypoint-initdb.d/01-create-dbs.sql:ro
     networks:
       - backend
 
