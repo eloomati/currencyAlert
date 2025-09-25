@@ -1,4 +1,4 @@
-package io.mhetko.currencyalert;
+package io.mhetko.dataprovider;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

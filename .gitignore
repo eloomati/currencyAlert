@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Ignoruj wszystkie pliki .env, ale nie .env.example
+.env
+.env.*
+!.env.example

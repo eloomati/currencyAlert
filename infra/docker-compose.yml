@@ -1,8 +1,8 @@
 services:
   postgres:
-    image: postgres:16
+    image: postgres:15
     environment:
-      POSTGRES_DB: currency_alert
+      POSTGRES_DB: currencyalert
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
     ports:
@@ -22,6 +22,7 @@ services:
 
   mailhog:
     image: mailhog/mailhog
+    platform: linux/amd64
     ports:
       - "1025:1025"
       - "8025:8025"
