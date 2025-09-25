@@ -8,12 +8,12 @@ Monorepo mikroserwisowej aplikacji do monitorowania kursów walut i powiadamiani
 
 * [Cel projektu](#cel-projektu)
 * [Architektura](#architektura)
+* [Uruchomienie lokalne (Docker Compose)](#uruchomienie-lokalne-docker-compose)
 * [Wybór technologii](#wybór-technologii)
 * [Wymagania funkcjonalne](#wymagania-funkcjonalne)
 * [Model domeny i schemat danych](#model-domeny-i-schemat-danych)
 * [Kontrakty komunikacji](#kontrakty-komunikacji)
 * [API DataProvider (REST)](#api-dataprovider-rest)
-* [Uruchomienie lokalne (Docker Compose)](#uruchomienie-lokalne-docker-compose)
 * [Konfiguracja i zmienne środowiskowe](#konfiguracja-i-zmienne-środowiskowe)
 * [Bezpieczeństwo](#bezpieczeństwo)
 * [Monitoring i logowanie](#monitoring-i-logowanie)
@@ -58,6 +58,20 @@ Dwa mikroserwisy + infrastruktura wspólna.
 
 ---
 
+---
+
+## Uruchomienie lokalne (Docker Compose)
+
+Uruchomienie:
+
+```bash
+cd infra && docker compose up -d --build
+# DataProvider -> http://localhost:8080/swagger-ui.html
+# RabbitMQ UI -> http://localhost:15672 (guest/guest)
+# MailHog UI -> http://localhost:8025
+```
+
+
 ## Wybór technologii
 
 Poniżej rekomendowana (spójna) ścieżka w Javie. Alternatywy wskazane kursywą.
@@ -66,7 +80,7 @@ Poniżej rekomendowana (spójna) ścieżka w Javie. Alternatywy wskazane kursyw�
 
 * Java 21, **Spring Boot 3.3+** (Security, Web, Validation, AMQP, Data JPA, Mail)
 * Konsument/producent MQ: **RabbitMQ** (AMQP 0.9.1) *(alternatywnie: Kafka)*
-* Baza danych: **PostgreSQL 16**
+* Baza danych: **PostgreSQL 15**
 * Migracje schematu: **Flyway**
 * Dokumentacja API: **springdoc-openapi** (Swagger UI)
 * JWT: **Spring Security + jjwt**
@@ -255,108 +269,10 @@ curl -X POST http://localhost:8080/api/v1/subscriptions \
   -d '{"symbol":"EUR/PLN","threshold_percent":1.5,"direction":"ANY"}'
 ```
 
----
-
-## Uruchomienie lokalne (Docker Compose)
-
-Minimalny stack dev: RabbitMQ, Postgres, MailHog, oba serwisy.
-
-```yaml
-# infra/docker-compose.yml
-version: '3.9'
-services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: alarmwalutowy
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-    ports: ["5432:5432"]
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - "5672:5672"
-      - "15672:15672"   # UI
-
-  mailhog:
-    image: mailhog/mailhog
-    ports:
-      - "1025:1025"     # SMTP
-      - "8025:8025"     # UI
-
-  data-provider:
-    build: ../data-provider
-    env_file:
-      - ../data-provider/.env.dev
-    depends_on: [postgres, rabbitmq, mailhog]
-    ports: ["8080:8080"]
-
-  data-gatherer:
-    build: ../data-gatherer
-    env_file:
-      - ../data-gatherer/.env.dev
-    depends_on: [rabbitmq]
-
-volumes:
-  pgdata: {}
-```
-
-Uruchomienie:
-
-```bash
-cd infra && docker compose up --build
-# DataProvider -> http://localhost:8080/swagger-ui.html
-# RabbitMQ UI -> http://localhost:15672 (guest/guest)
-# MailHog UI -> http://localhost:8025
-```
 
 ---
 
 ## Konfiguracja i zmienne środowiskowe
-
-### DataGatherer – `.env.dev`
-
-```
-SPRING_PROFILES_ACTIVE=dev
-DG_PROVIDER=openexchangerates
-DG_BASE=USD
-DG_SYMBOLS=PLN,EUR,GBP
-DG_FETCH_CRON=0 0 * * * *
-DG_API_URL=https://openexchangerates.org/api/latest.json
-DG_API_KEY=changeme
-AMQP_HOST=rabbitmq
-AMQP_PORT=5672
-AMQP_USERNAME=guest
-AMQP_PASSWORD=guest
-AMQP_EXCHANGE=fx.events
-AMQP_ROUTING_KEY=rate.changed
-AMQP_QUEUE=fx.rate.changed
-```
-
-### DataProvider – `.env.dev`
-
-```
-SPRING_PROFILES_ACTIVE=dev
-DB_HOST=postgres
-DB_PORT=5432
-DB_NAME=alarmwalutowy
-DB_USER=app
-DB_PASS=app
-AMQP_HOST=rabbitmq
-AMQP_PORT=5672
-AMQP_USERNAME=guest
-AMQP_PASSWORD=guest
-AMQP_QUEUE=fx.rate.changed
-JWT_SECRET=please-change
-JWT_EXP_MIN=60
-MAIL_HOST=mailhog
-MAIL_PORT=1025
-MAIL_FROM=no-reply@alarmwalutowy.local
-RATE_LIMIT_PER_MIN=120
-```
 
 ---
 
