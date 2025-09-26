@@ -121,75 +121,14 @@ Struktura repo (monorepo):
 
 ## Model domeny i schemat danych
 
-Minimalny schemat relacyjny (PostgreSQL):
+Schemat relacyjny (PostgreSQL):
 
-```
-users (
-  id uuid PK,
-  email citext UNIQUE NOT NULL,
-  password_hash text NOT NULL,
-  created_at timestamptz NOT NULL,
-  is_active boolean NOT NULL DEFAULT true,
-  role text NOT NULL DEFAULT 'USER'
-)
+* `data_provider`
+![Schemat kursów walut](docs/exchange_rate.png)
 
-subscriptions (
-  id uuid PK,
-  user_id uuid FK -> users(id),
-  symbol text NOT NULL,          -- np. "EUR/PLN"
-  threshold_percent numeric(6,3) NOT NULL, -- np. 1.5 = 1.5%
-  direction text NOT NULL CHECK (direction IN ('UP','DOWN','ANY')),
-  is_active boolean NOT NULL DEFAULT true,
-  created_at timestamptz NOT NULL
-)
 
-exchange_rate (
-  id uuid PK,
-  base text NOT NULL,            -- np. "USD"
-  symbol text NOT NULL,          -- np. "PLN"
-  rate numeric(18,8) NOT NULL,
-  as_of timestamptz NOT NULL,    -- czas zródła
-  created_at timestamptz NOT NULL,
-  UNIQUE(base, symbol)           -- aktualny ostatni znany kurs
-)
-
-exchange_rate_history (
-  id uuid PK,
-  base text NOT NULL,
-  symbol text NOT NULL,
-  rate numeric(18,8) NOT NULL,
-  as_of timestamptz NOT NULL,
-  ingested_at timestamptz NOT NULL,
-  UNIQUE(base, symbol, as_of)
-)
-
-notifications (
-  id uuid PK,
-  user_id uuid FK -> users(id),
-  symbol text NOT NULL,
-  change_percent numeric(8,4) NOT NULL,
-  direction text NOT NULL,
-  rate_before numeric(18,8) NOT NULL,
-  rate_after numeric(18,8) NOT NULL,
-  triggered_at timestamptz NOT NULL,
-  sent_at timestamptz NULL,
-  channel text NOT NULL DEFAULT 'EMAIL'
-)
-
-message_outbox (
-  id uuid PK,
-  aggregate_type text NOT NULL,
-  aggregate_id uuid NOT NULL,
-  payload jsonb NOT NULL,
-  created_at timestamptz NOT NULL,
-  sent_at timestamptz NULL
-)
-```
-
-Uwagi:
-
-* `exchange_rate` przechowuje ostatni znany kurs, a pełna historia w `exchange_rate_history`.
-* `message_outbox` do wzorca **Transactional Outbox** (opcjonalne, przydatne przy skalowaniu powiadomień).
+* `data_gatherer`
+![Schemat kursów walut](docs/currencyalert_gatherer.png)
 
 ---
 
