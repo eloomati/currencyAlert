@@ -21,7 +21,7 @@ public class OpenExchangeRatesClient implements RateProvider {
 
     public OpenExchangeRatesClient(ProviderProperties properties) {
         this.restClient = RestClient.builder()
-                .baseUrl(props.apiUrl())
+                .baseUrl(properties.apiUrl())
                 .build();
         this.properties = properties;
     }
@@ -40,7 +40,7 @@ public class OpenExchangeRatesClient implements RateProvider {
         String symbolsParam = String.join(",", symbols);
 
         String uri = UriComponentsBuilder.fromPath("")
-                .queryParam("app_id", props.apiKey())
+                .queryParam("app_id", properties.apiKey())
                 .queryParam("base", base)
                 .queryParam("symbols", symbolsParam)
                 .build(true)
