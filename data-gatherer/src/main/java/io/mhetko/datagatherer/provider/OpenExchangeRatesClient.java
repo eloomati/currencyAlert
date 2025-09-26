@@ -39,14 +39,12 @@ public class OpenExchangeRatesClient implements RateProvider {
     private String buildLatestUri(String base, List<String> symbols) {
         String symbolsParam = String.join(",", symbols);
 
-        String uri = UriComponentsBuilder.fromPath("")
+        return UriComponentsBuilder.fromPath("")
                 .queryParam("app_id", properties.apiKey())
                 .queryParam("base", base)
                 .queryParam("symbols", symbolsParam)
                 .build(true)
                 .toUriString();
-
-        return uri;
     }
 
     private OerLatestResponse fetchLatestDto(String uri) {
