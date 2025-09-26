@@ -101,7 +101,6 @@ class CurrentUpdateServiceTest {
     }
 
     @Test
-    @DisplayName("Gdy rekord istnieje – aktualizuje pola (rate, asOf, updatedAt) i dopisuje historię")
     void saveExistingRate_updatesEntityAndHistory() {
         // given
         String base = "EUR", symbol = "USD";
