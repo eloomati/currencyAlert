@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
                                              user_id UUID NOT NULL REFERENCES users(id),
                                              symbol TEXT NOT NULL,
                                              threshold_percent NUMERIC(6,3) NOT NULL,
-                                             direction TEXT NOT NULL CHECK (direction IN ('UP','DOWN','ANY')),
                                              is_active BOOLEAN NOT NULL DEFAULT true,
                                              created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

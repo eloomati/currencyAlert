@@ -9,8 +9,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
@@ -19,7 +19,7 @@ import java.time.OffsetDateTime;
 @Table(name = "gatherer_last_rates", uniqueConstraints = @UniqueConstraint(columnNames = {"base_id", "target_id"}))
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder(toBuilder = true)
 public class RateEntity {
 
     @Id
@@ -40,6 +40,7 @@ public class RateEntity {
     @Column(name = "as_of", nullable = false)
     private OffsetDateTime asOf;
 
+    @Builder.Default
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt = OffsetDateTime.now();
 }
