@@ -1,6 +1,5 @@
 package io.mhetko.datagatherer.service;
 
-import io.mhetko.datagatherer.config.CurrencyProperties;
 import io.mhetko.datagatherer.model.CurrencyEntity;
 import io.mhetko.datagatherer.model.ExchangeRateHistoryEntity;
 import io.mhetko.datagatherer.model.RateEntity;
