@@ -17,10 +17,6 @@ public class RateChangedProducer {
     @Value("${amqp.routing-key}")
     private String routingKey;
 
-    public void sendText(String text) {
-        rabbitTemplate.convertAndSend(exchange, routingKey, text);
-    }
-
     public void sendJson(Object payload) {
         rabbitTemplate.convertAndSend(exchange, routingKey, payload);
     }
