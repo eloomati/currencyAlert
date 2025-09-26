@@ -61,6 +61,9 @@ Dwa mikroserwisy + infrastruktura wspólna.
 ---
 
 ## Uruchomienie lokalne (Docker Compose)
+Uzupełnij plik `.env` w katalogu `infra/` (na podstawie `.env.example`).
+
+Aby uzyskać klucz do API Open Exchange Rates, zapoznać się z instrukcją https://docs.openexchangerates.org/reference/authentication.
 
 Uruchomienie:
 
