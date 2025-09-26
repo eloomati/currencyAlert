@@ -146,7 +146,7 @@ class CurrentUpdateServiceTest {
         // when / then
         assertThatThrownBy(this::callFetchAndSaveRatesWithNow)
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Nie znaleziono waluty bazowej");
+                .hasMessageContaining("Base currency not found:");
 
         verify(rateRepository, never()).save(any());
         verify(exchangeRateHistoryRepository, never()).save(any());
