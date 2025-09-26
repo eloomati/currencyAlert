@@ -32,6 +32,13 @@ public class CurrentUpdateService {
         }
     }
 
+    public Double getLatestRate(String base, String symbol) {
+        return exchangeRateHistoryRepository
+                .findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol)
+                .map(ExchangeRateHistoryEntity::getRate)
+                .orElse(null);
+    }
+
     private void saveRate(String base, String symbol, Double rate, OffsetDateTime asOf) {
         RateEntity rateEntity = buildOrUpdateRateEntity(base, symbol, rate, asOf);
         rateRepository.save(rateEntity);

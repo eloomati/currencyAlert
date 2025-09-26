@@ -181,4 +181,42 @@ class CurrentUpdateServiceTest {
         verify(rateRepository, times(2)).save(any(RateEntity.class));
         verify(exchangeRateHistoryRepository, times(2)).save(any(ExchangeRateHistoryEntity.class));
     }
+
+
+    @Test
+    void getLatestRate_returnsRateIfExists() {
+        //given
+        String base = "EUR", symbol = "PLN";
+        double rate = 4.25;
+        ExchangeRateHistoryEntity entity = ExchangeRateHistoryEntity.builder()
+                .base(base)
+                .symbol(symbol)
+                .rate(rate)
+                .asOf(OffsetDateTime.now())
+                .build();
+
+        //when
+        when(exchangeRateHistoryRepository.findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol))
+                .thenReturn(Optional.of(entity));
+
+        //then
+        Double result = service.getLatestRate(base, symbol);
+
+        assertThat(result).isEqualTo(rate);
+    }
+
+
+    @Test
+    void getLatestRate_returnsNullIfNoData() {
+        //given
+        String base = "EUR", symbol = "PLN";
+        //when
+        when(exchangeRateHistoryRepository.findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol))
+                .thenReturn(Optional.empty());
+
+        //then
+        Double result = service.getLatestRate(base, symbol);
+
+        assertThat(result).isNull();
+    }
 }
