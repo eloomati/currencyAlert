@@ -19,28 +19,6 @@ CREATE TABLE IF NOT EXISTS subscriptions (
 );
 
 
-CREATE TABLE IF NOT EXISTS exchange_rate (
-                                             id UUID PRIMARY KEY,
-                                             base TEXT NOT NULL,
-                                             symbol TEXT NOT NULL,
-                                             rate NUMERIC(18,8) NOT NULL,
-                                             as_of TIMESTAMPTZ NOT NULL,
-                                             created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-                                             UNIQUE(base, symbol)
-);
-
-
-CREATE TABLE IF NOT EXISTS exchange_rate_history (
-                                                     id UUID PRIMARY KEY,
-                                                     base TEXT NOT NULL,
-                                                     symbol TEXT NOT NULL,
-                                                     rate NUMERIC(18,8) NOT NULL,
-                                                     as_of TIMESTAMPTZ NOT NULL,
-                                                     ingested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-                                                     UNIQUE(base, symbol, as_of)
-);
-
-
 CREATE TABLE IF NOT EXISTS notifications (
                                              id UUID PRIMARY KEY,
                                              user_id UUID NOT NULL REFERENCES users(id),
