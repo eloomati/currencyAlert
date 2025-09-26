@@ -2,7 +2,7 @@ package io.mhetko.datagatherer.scheduler;
 
 import io.mhetko.datagatherer.config.CurrencyProperties;
 import io.mhetko.datagatherer.service.CurrentUpdateService;
-import org.junit.jupiter.api.DisplayName;
+import io.mhetko.datagatherer.service.RateChangeNotifierService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -25,6 +25,9 @@ class RateUpdateSchedulerTest {
     @Mock
     private CurrencyProperties currencyProperties;
 
+    @Mock
+    private RateChangeNotifierService rateChangeNotifierService;
+
     @Captor
     private ArgumentCaptor<String> baseCaptor;
 
@@ -43,7 +46,9 @@ class RateUpdateSchedulerTest {
         when(currencyProperties.getBase()).thenReturn(base);
         when(currencyProperties.getMainCurrencies()).thenReturn(symbols);
 
-        RateUpdateScheduler scheduler = new RateUpdateScheduler(currentUpdateService, currencyProperties);
+        RateUpdateScheduler scheduler = new RateUpdateScheduler(
+                currentUpdateService, currencyProperties, rateChangeNotifierService
+        );
 
         OffsetDateTime before = OffsetDateTime.now();
 
@@ -60,8 +65,7 @@ class RateUpdateSchedulerTest {
         assertThat(symbolsCaptor.getValue()).containsExactlyElementsOf(symbols);
 
         OffsetDateTime asOf = asOfCaptor.getValue();
-        assertThat(asOf).isAfterOrEqualTo(before);
-        assertThat(asOf).isBeforeOrEqualTo(after);
+        assertThat(asOf).isBetween(before, after);
     }
 
     @Test
@@ -70,7 +74,9 @@ class RateUpdateSchedulerTest {
         when(currencyProperties.getBase()).thenReturn("EUR");
         when(currencyProperties.getMainCurrencies()).thenReturn(List.of());
 
-        RateUpdateScheduler scheduler = new RateUpdateScheduler(currentUpdateService, currencyProperties);
+        RateUpdateScheduler scheduler = new RateUpdateScheduler(
+                currentUpdateService, currencyProperties, rateChangeNotifierService
+        );
 
         // when
         scheduler.updateRates();
@@ -78,5 +84,33 @@ class RateUpdateSchedulerTest {
         // then
         verify(currentUpdateService, times(1))
                 .fetchAndSaveRates(eq("EUR"), eq(List.of()), any(OffsetDateTime.class));
+    }
+
+    @Test
+    void updateRates_notifiesOnlyForNonNullRates() {
+        // given
+        String base = "EUR";
+        List<String> symbols = List.of("PLN", "USD");
+        double threshold = 0.1;
+
+        // when
+        when(currencyProperties.getBase()).thenReturn(base);
+        when(currencyProperties.getMainCurrencies()).thenReturn(symbols);
+        when(currencyProperties.getRateChangeThreshold()).thenReturn(threshold);
+
+        when(currentUpdateService.getLatestRate(base, "PLN")).thenReturn(4.5);
+        when(currentUpdateService.getLatestRate(base, "USD")).thenReturn(null);
+
+        RateUpdateScheduler scheduler = new RateUpdateScheduler(
+                currentUpdateService, currencyProperties, rateChangeNotifierService
+        );
+
+        scheduler.updateRates();
+
+        // then
+        verify(rateChangeNotifierService, times(1))
+                .notifyIfRateChanged(base, "PLN", threshold, 4.5);
+        verify(rateChangeNotifierService, never())
+                .notifyIfRateChanged(eq(base), eq("USD"), anyDouble(), anyDouble());
     }
 }

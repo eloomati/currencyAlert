@@ -16,4 +16,5 @@ import java.util.List;
 public class CurrencyProperties {
     private String base;
     private List<String> mainCurrencies;
+    private double rateChangeThreshold;
 }

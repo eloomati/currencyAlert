@@ -32,6 +32,13 @@ public class CurrentUpdateService {
         }
     }
 
+    public Double getLatestRate(String base, String symbol) {
+        return exchangeRateHistoryRepository
+                .findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol)
+                .map(ExchangeRateHistoryEntity::getRate)
+                .orElse(null);
+    }
+
     private void saveRate(String base, String symbol, Double rate, OffsetDateTime asOf) {
         RateEntity rateEntity = buildOrUpdateRateEntity(base, symbol, rate, asOf);
         rateRepository.save(rateEntity);
@@ -42,9 +49,9 @@ public class CurrentUpdateService {
 
     private RateEntity buildOrUpdateRateEntity(String base, String symbol, Double rate, OffsetDateTime asOf) {
         CurrencyEntity baseCurrency = currencyRepository.findByCode(base)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono waluty bazowej: " + base));
+                .orElseThrow(() -> new IllegalArgumentException("Base currency not found: " + base));
         CurrencyEntity targetCurrency = currencyRepository.findByCode(symbol)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono waluty docelowej: " + symbol));
+                .orElseThrow(() -> new IllegalArgumentException("Target currency not found:  " + symbol));
 
         return rateRepository.findByBaseAndTarget(baseCurrency, targetCurrency)
                 .orElse(RateEntity.builder()
