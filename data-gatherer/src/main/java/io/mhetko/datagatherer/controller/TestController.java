@@ -1,18 +1,21 @@
+// data-gatherer/src/main/java/io/mhetko/datagatherer/controller/TestController.java
 package io.mhetko.datagatherer.controller;
 
-import org.springframework.data.redis.core.RedisTemplate;
+import io.mhetko.datagatherer.producer.RateChangedProducer;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/test")
 public class TestController {
     private final StringRedisTemplate redisTemplate;
-    public TestController(StringRedisTemplate redisTemplate) {
+    private final RateChangedProducer rateChangedProducer;
+
+    public TestController(StringRedisTemplate redisTemplate, RateChangedProducer rateChangedProducer) {
         this.redisTemplate = redisTemplate;
+        this.rateChangedProducer = rateChangedProducer;
     }
+
     @GetMapping("/redis-test")
     public String testRedis() {
         try {
@@ -22,5 +25,9 @@ public class TestController {
             return "Redis error: " + e.getMessage();
         }
     }
-}
 
+    @PostMapping("/simulate")
+    public void simulateRateChange(@RequestBody Object payload) {
+        rateChangedProducer.sendJson(payload);
+    }
+}

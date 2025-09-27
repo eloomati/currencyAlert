@@ -1,1 +1,10 @@
-GET http://localhost:8081/test/redis-test
+### Symulacja wysyłki komunikatu RabbitMQ
+POST http://localhost:8081/test/simulate
+Content-Type: application/json
+
+{
+  "base": "EUR",
+  "symbol": "USD",
+  "rate": 4.50,
+  "asOf": "2025-09-29T12:00:00Z"
+}

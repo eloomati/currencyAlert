@@ -2,6 +2,8 @@
 package io.mhetko.dataprovider.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import io.mhetko.dataprovider.repository.ExchangeRateHistoryRepository;
@@ -14,13 +16,18 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ExchangeRateHistoryService {
 
     private final ExchangeRateHistoryRepository exchangeRateHistoryRepository;
 
     public void saveHistory(String base, String symbol, Double rate, OffsetDateTime asOf) {
         ExchangeRateHistoryEntity entity = buildHistoryEntity(base, symbol, rate, asOf);
-        exchangeRateHistoryRepository.save(entity);
+        try {
+            exchangeRateHistoryRepository.save(entity);
+        } catch (DataIntegrityViolationException e) {
+            log.info("Duplicate history entry ignored: base={}, symbol={}, asOf={}", base, symbol, asOf);
+        }
     }
 
     public List<ExchangeRateHistoryEntity> getLastTwo(String symbol) {

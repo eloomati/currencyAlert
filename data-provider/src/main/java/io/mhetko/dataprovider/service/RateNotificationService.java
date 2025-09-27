@@ -5,6 +5,7 @@ import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,6 +18,7 @@ public class RateNotificationService {
     private final ExchangeRateHistoryService historyService;
     private final EmailService emailService;
 
+    @Transactional
     public void checkAndNotify(Subscription subscription) {
         log.info("Checking subscription: id={}, symbol={}, threshold={}",
                 subscription.getId(), subscription.getSymbol(), subscription.getThreshold());
