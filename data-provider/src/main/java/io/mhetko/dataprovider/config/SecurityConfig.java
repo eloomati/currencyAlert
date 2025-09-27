@@ -28,7 +28,9 @@ public class SecurityConfig {
             "/api/v1/auth/**",
             "/h2-console/**",
             "/rabbit/**",
-            "/api/test/email"
+            "/api/test/email",
+            "/api/rate/**",
+            "/api/history/**"
     };
 
     @Bean

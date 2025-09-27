@@ -90,7 +90,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public List<Subscription> findActiveBySymbol(String symbol) {
         String normalized = normalizeSymbol(symbol);
-        return subscriptionRepository.findBySymbolAndActiveTrue(normalized);
+        return subscriptionRepository.findBySymbolAndIsActiveTrue(normalized);
     }
 
     private static String normalizeSymbol(String symbol) {

@@ -1,0 +1,9 @@
+### Pobierz najnowszy kurs USD
+GET http://localhost:8080/api/rate/USD
+Accept: application/json
+
+###
+
+### Pobierz historię kursów USD
+GET http://localhost:8080/api/history/USD
+Accept: application/json

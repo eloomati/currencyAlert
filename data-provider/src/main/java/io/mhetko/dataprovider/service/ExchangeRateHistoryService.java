@@ -1,3 +1,4 @@
+// data-provider/src/main/java/io/mhetko/dataprovider/service/ExchangeRateHistoryService.java
 package io.mhetko.dataprovider.service;
 
 import lombok.RequiredArgsConstructor;
@@ -6,8 +7,8 @@ import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import io.mhetko.dataprovider.repository.ExchangeRateHistoryRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,14 @@ public class ExchangeRateHistoryService {
                 .findTop2BySymbolOrderByAsOfDesc(symbol);
     }
 
+    public List<ExchangeRateHistoryEntity> getHistoryByBase(String base) {
+        return exchangeRateHistoryRepository.findByBaseOrderByAsOfDesc(base.toUpperCase());
+    }
+
+    public List<ExchangeRateHistoryEntity> getLatestRatesByBase(String base) {
+        return exchangeRateHistoryRepository.findLatestRatesByBase(base.toUpperCase());
+    }
+
     private ExchangeRateHistoryEntity buildHistoryEntity(String base, String symbol, Double rate, OffsetDateTime asOf) {
         return ExchangeRateHistoryEntity.builder()
                 .id(UUID.randomUUID())
@@ -35,6 +44,4 @@ public class ExchangeRateHistoryService {
                 .ingestedAt(OffsetDateTime.now())
                 .build();
     }
-
-
 }
