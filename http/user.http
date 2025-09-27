@@ -23,16 +23,16 @@ Content-Type: application/json
 
 ### Odświeżenie tokena JWT
 POST http://localhost:8080/api/v1/auth/refresh-token
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5Mzk5MiwiZXhwIjoxNzU4OTk0ODkyfQ.sUSffjwQ2Yyq5Uv4Xk0AAZWXRr4t5z8fJD8OHvk1zlU
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwMjg1MywiZXhwIjoxNzU5MDAzNzUzfQ.fon77PA9YXOcIG6-Hz_ECBe-Jo1vwEDRNEk_mZWo3tQ
 Content-Type: application/json
 
 
 ### Dodanie subskrypcji dla użytkownika
 POST http://localhost:8080/api/subscriptions
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NzM4MSwiZXhwIjoxNzU4OTk4MjgxfQ.ATAuxU14_F7zdQsBp7bEgLMv7MYiDbcCNYbapGXqthw
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwMzQyMywiZXhwIjoxNzU5MDA0MzIzfQ.XJhjWrLSqQt3VhQxqv2Py5conTfPuIBUrh8XiF7XUBw
 Content-Type: application/x-www-form-urlencoded
 
-symbol=pln&threshold=100.00
+symbol=usd&threshold=1.00
 
 ### Usunięcie subskrypcji (soft delete)
 DELETE http://localhost:8080/api/subscriptions/9aabd5ac-7c7a-4bbd-ac93-c970b5c6ad21
@@ -44,4 +44,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1O
 
 ### Pobranie subskrypcji zalogowanego użytkownika
 GET http://localhost:8080/api/subscriptions/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NzM4MSwiZXhwIjoxNzU4OTk4MjgxfQ.ATAuxU14_F7zdQsBp7bEgLMv7MYiDbcCNYbapGXqthw
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwMzQyMywiZXhwIjoxNzU5MDA0MzIzfQ.XJhjWrLSqQt3VhQxqv2Py5conTfPuIBUrh8XiF7XUBw
+
+### Symulacja powiadomienia dla subskrypcji (konsument RabbitMQ)
+# Wklej poniżej subscriptionId z poprzedniej odpowiedzi
+POST http://localhost:8080/api/test/notification/simulate?subscriptionId=ae50ef2e-28b5-420c-a14d-76c781e683ee&symbol=USD
