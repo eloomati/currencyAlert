@@ -37,7 +37,6 @@ CREATE TABLE IF NOT EXISTS subscriptions
     id                UUID PRIMARY KEY,
     user_id           UUID          NOT NULL REFERENCES users (id),
     symbol            TEXT          NOT NULL,
-    threshold_percent NUMERIC(6, 3) NOT NULL,
     is_active         BOOLEAN       NOT NULL DEFAULT true,
     created_at        TIMESTAMPTZ   NOT NULL DEFAULT now()
 );
@@ -49,7 +48,6 @@ CREATE TABLE IF NOT EXISTS notifications
     user_id        UUID           NOT NULL REFERENCES users (id),
     symbol         TEXT           NOT NULL,
     change_percent NUMERIC(8, 4)  NOT NULL,
-    direction      TEXT           NOT NULL,
     rate_before    NUMERIC(18, 8) NOT NULL,
     rate_after     NUMERIC(18, 8) NOT NULL,
     triggered_at   TIMESTAMPTZ    NOT NULL,
