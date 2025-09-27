@@ -60,7 +60,7 @@ class AppUserServiceImplTest {
         role.setName(RoleName.ROLE_USER);
 
         when(passwordEncoder.encode("plainPassword")).thenReturn("encodedPassword");
-        when(roleRepository.findByName(RoleName.ROLE_USER.name())).thenReturn(role);
+        when(roleRepository.findByName(RoleName.ROLE_USER)).thenReturn(role);
 
         service.saveUser(user);
 

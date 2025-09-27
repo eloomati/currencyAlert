@@ -2,6 +2,7 @@ package io.mhetko.dataprovider.service;
 
 import io.mhetko.dataprovider.model.AppUser;
 import io.mhetko.dataprovider.model.Role;
+import io.mhetko.dataprovider.model.enums.RoleName;
 import io.mhetko.dataprovider.repository.AppUserRepository;
 import io.mhetko.dataprovider.repository.RoleRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +39,7 @@ public class AppUserServiceImpl implements AppUserService {
     public void saveUser(AppUser user) {
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
         user.setActive(true);
-        Role userRole = roleRepository.findByName("ROLE_USER");
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER);
         user.setRoles(new HashSet<>(Arrays.asList(userRole)));
         userRepository.save(user);
     }
