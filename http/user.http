@@ -1,0 +1,73 @@
+### Tworzenie nowego użytkownika
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "nowyuser",
+  "email": "nowyuser@example.com",
+  "passwordHash": "haslo123",
+  "isActive": true,
+  "roles": [
+    { "id": 1, "name": "ROLE_USER" }
+  ]
+}
+
+### Logowanie i pobranie tokena JWT
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "nowyuser",
+  "password": "haslo123"
+}
+
+### Odświeżenie tokena JWT
+POST http://localhost:8080/api/v1/auth/refresh-token
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwNDg4MywiZXhwIjoxNzU5MDA1NzgzfQ.qzVdnlxpGgqqyCRG0uU_1HAQpq-mgy5U3tEL1H0VFjU
+Content-Type: application/json
+
+
+### Dodanie subskrypcji dla użytkownika
+POST http://localhost:8080/api/subscriptions
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwNTMxNiwiZXhwIjoxNzU5MDA2MjE2fQ.DIXRBo9-lQNzwge9VjBjlHAVShH_0z6KSAcy8VVcXmE
+Content-Type: application/x-www-form-urlencoded
+
+symbol=usd&threshold=1.00
+
+### Usunięcie subskrypcji (soft delete)
+DELETE http://localhost:8080/api/subscriptions/9aabd5ac-7c7a-4bbd-ac93-c970b5c6ad21
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NzM4MSwiZXhwIjoxNzU4OTk4MjgxfQ.ATAuxU14_F7zdQsBp7bEgLMv7MYiDbcCNYbapGXqthw
+
+### Aktualizacja statusu subskrypcji
+PUT http://localhost:8080/api/subscriptions/9aabd5ac-7c7a-4bbd-ac93-c970b5c6ad21?active=true
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NzM4MSwiZXhwIjoxNzU4OTk4MjgxfQ.ATAuxU14_F7zdQsBp7bEgLMv7MYiDbcCNYbapGXqthw
+
+### Pobranie subskrypcji zalogowanego użytkownika
+GET http://localhost:8080/api/subscriptions/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1OTAwNTMxNiwiZXhwIjoxNzU5MDA2MjE2fQ.DIXRBo9-lQNzwge9VjBjlHAVShH_0z6KSAcy8VVcXmE
+
+### Symulacja powiadomienia dla subskrypcji (konsument RabbitMQ)
+# Wklej poniżej subscriptionId z poprzedniej odpowiedzi
+POST http://localhost:8080/api/test/notification/simulate?subscriptionId=5b2d01c2-1060-4275-830f-e23908d1e6e1&symbol=USD
+
+
+### Symulacja wysyłki komunikatu RabbitMQ
+POST http://localhost:8081/test/simulate
+Content-Type: application/json
+
+{
+  "base": "EUR",
+  "symbol": "USD",
+  "rate": 9.50,
+  "asOf": "2025-09-29T16:00:00Z"
+}
+
+### Pobierz najnowszy kurs USD
+GET http://localhost:8080/api/rate/USD
+Accept: application/json
+
+###
+
+### Pobierz historię kursów USD
+GET http://localhost:8080/api/history/USD
+Accept: application/json

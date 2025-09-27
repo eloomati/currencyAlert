@@ -1,0 +1,2 @@
+CREATE DATABASE currencyalert_provider;
+CREATE DATABASE currencyalert_gatherer;
