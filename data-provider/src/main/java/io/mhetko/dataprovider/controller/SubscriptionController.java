@@ -1,6 +1,7 @@
 package io.mhetko.dataprovider.controller;
 
 import io.mhetko.dataprovider.dto.SubscriptionDto;
+import io.mhetko.dataprovider.model.SubscriptionDeleteResponse;
 import io.mhetko.dataprovider.service.SubscriptionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +28,12 @@ public class SubscriptionController {
     }
 
     @DeleteMapping("/{subscriptionId}")
-    public ResponseEntity<Void> removeSubscription(@PathVariable UUID subscriptionId) {
+    public ResponseEntity<SubscriptionDeleteResponse> removeSubscription(@PathVariable UUID subscriptionId) {
         subscriptionService.removeSubscription(subscriptionId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(new SubscriptionDeleteResponse(
+                subscriptionId,
+                "Subscription has been successfully deleted."
+        ));
     }
 
     @PutMapping("/{subscriptionId}")

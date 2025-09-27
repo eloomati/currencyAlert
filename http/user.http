@@ -29,19 +29,19 @@ Content-Type: application/json
 
 ### Dodanie subskrypcji dla użytkownika
 POST http://localhost:8080/api/subscriptions
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDE3NiwiZXhwIjoxNzU4OTk1MDc2fQ.a7NMS59AcQU02TE9640DlNhmANp4cxH-w1r4kAGiYco
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
 Content-Type: application/x-www-form-urlencoded
 
 symbol=btc
 
 ### Usunięcie subskrypcji (soft delete)
-DELETE http://localhost:8080/api/subscriptions/{{subscriptionId}}
-Authorization: Bearer {{jwt_token}}
+DELETE http://localhost:8080/api/subscriptions/efc860dd-69c0-4a29-b86d-e3953d280957
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
 
 ### Aktualizacja statusu subskrypcji
-PUT http://localhost:8080/api/subscriptions/{{subscriptionId}}?active=true
-Authorization: Bearer {{jwt_token}}
+PUT http://localhost:8080/api/subscriptions/efc860dd-69c0-4a29-b86d-e3953d280957?active=true
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
 
 ### Pobranie subskrypcji zalogowanego użytkownika
 GET http://localhost:8080/api/subscriptions/me
-Authorization: Bearer {{jwt_token}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
