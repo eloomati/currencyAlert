@@ -1,4 +1,3 @@
-// data-gatherer/src/main/java/io/mhetko/datagatherer/controller/TestController.java
 package io.mhetko.datagatherer.controller;
 
 import io.mhetko.datagatherer.producer.RateChangedProducer;
