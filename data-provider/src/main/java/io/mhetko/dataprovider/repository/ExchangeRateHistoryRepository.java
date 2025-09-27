@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ExchangeRateHistoryRepository extends JpaRepository<ExchangeRateHistoryEntity, UUID> {
-    List<ExchangeRateHistoryEntity> findTop2ByBaseAndSymbolOrderByAsOfDesc(String base, String symbol);
-
-    Optional<ExchangeRateHistoryEntity> findTop1ByBaseAndSymbolOrderByAsOfDesc(String base, String symbol);
+    List<ExchangeRateHistoryEntity> findTop2BySymbolOrderByAsOfDesc(String symbol);
+    Optional<ExchangeRateHistoryEntity> findTop1BySymbolOrderByAsOfDesc(String symbol);
 }

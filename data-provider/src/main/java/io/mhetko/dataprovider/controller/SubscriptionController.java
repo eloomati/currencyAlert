@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,9 +22,10 @@ public class SubscriptionController {
     @PostMapping
     public ResponseEntity<SubscriptionDto> addSubscription(
             @RequestParam String symbol,
+            @RequestParam(required = false) BigDecimal threshold,
             @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal) {
         String username = principal.getUsername();
-        SubscriptionDto dto = subscriptionService.addSubscription(username, symbol);
+        SubscriptionDto dto = subscriptionService.addSubscription(username, symbol, threshold);
         return ResponseEntity.ok(dto);
     }
 
@@ -39,8 +41,9 @@ public class SubscriptionController {
     @PutMapping("/{subscriptionId}")
     public ResponseEntity<SubscriptionDto> updateSubscription(
             @PathVariable UUID subscriptionId,
-            @RequestParam boolean active) {
-        SubscriptionDto dto = subscriptionService.updateSubscription(subscriptionId, active);
+            @RequestParam boolean active,
+            @RequestParam(required = false) BigDecimal threshold) {
+        SubscriptionDto dto = subscriptionService.updateSubscription(subscriptionId, active, threshold);
         return ResponseEntity.ok(dto);
     }
 

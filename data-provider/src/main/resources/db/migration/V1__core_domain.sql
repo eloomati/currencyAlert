@@ -38,7 +38,8 @@ CREATE TABLE IF NOT EXISTS subscriptions
     user_id           UUID          NOT NULL REFERENCES users (id),
     symbol            TEXT          NOT NULL,
     is_active         BOOLEAN       NOT NULL DEFAULT true,
-    created_at        TIMESTAMPTZ   NOT NULL DEFAULT now()
+    created_at        TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    threshold         NUMERIC(8,4)  NOT NULL DEFAULT 0.0
 );
 
 

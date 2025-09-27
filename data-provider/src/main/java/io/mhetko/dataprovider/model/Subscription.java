@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -28,4 +29,7 @@ public class Subscription {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMPTZ DEFAULT now()")
     private OffsetDateTime createdAt;
+
+    @Column(name = "threshold", nullable = false, precision = 8, scale = 4)
+    private BigDecimal threshold = BigDecimal.ZERO;
 }

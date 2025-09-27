@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +25,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Transactional
     @Override
-    public SubscriptionDto addSubscription(String username, String symbol) {
+    public SubscriptionDto addSubscription(String username, String symbol, BigDecimal threshold) {
         AppUser user = appUserRepository.findByUsername(username)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
@@ -40,6 +41,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
         s.setUser(user);
         s.setSymbol(normalized);
         s.setActive(true);
+        s.setThreshold(threshold != null ? threshold : BigDecimal.ZERO);
 
         return subscriptionMapper.toDto(subscriptionRepository.save(s));
     }
@@ -57,15 +59,20 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Transactional
     @Override
-    public SubscriptionDto updateSubscription(UUID subscriptionId, boolean isActive) {
+    public SubscriptionDto updateSubscription(UUID subscriptionId, boolean isActive, BigDecimal threshold) {
         Subscription s = subscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new EntityNotFoundException("Subscription not found: " + subscriptionId));
 
-        if (s.isActive() == isActive) {
-            return subscriptionMapper.toDto(s);
+        boolean changed = false;
+        if (s.isActive() != isActive) {
+            s.setActive(isActive);
+            changed = true;
         }
-        s.setActive(isActive);
-        return subscriptionMapper.toDto(subscriptionRepository.save(s));
+        if (threshold != null && !threshold.equals(s.getThreshold())) {
+            s.setThreshold(threshold);
+            changed = true;
+        }
+        return changed ? subscriptionMapper.toDto(subscriptionRepository.save(s)) : subscriptionMapper.toDto(s);
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,7 @@ package io.mhetko.dataprovider.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -12,4 +13,5 @@ public class SubscriptionDto {
     private String symbol;
     private boolean isActive;
     private OffsetDateTime createdAt;
+    private BigDecimal threshold;
 }
