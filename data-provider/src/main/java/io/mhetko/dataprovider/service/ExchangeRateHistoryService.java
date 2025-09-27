@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import io.mhetko.dataprovider.repository.ExchangeRateHistoryRepository;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +20,11 @@ public class ExchangeRateHistoryService {
         exchangeRateHistoryRepository.save(entity);
     }
 
+    public List<ExchangeRateHistoryEntity> getLastTwo(String symbol) {
+        return exchangeRateHistoryRepository
+                .findTop2BySymbolOrderByAsOfDesc(symbol);
+    }
+
     private ExchangeRateHistoryEntity buildHistoryEntity(String base, String symbol, Double rate, OffsetDateTime asOf) {
         return ExchangeRateHistoryEntity.builder()
                 .id(UUID.randomUUID())
@@ -28,4 +35,6 @@ public class ExchangeRateHistoryService {
                 .ingestedAt(OffsetDateTime.now())
                 .build();
     }
+
+
 }

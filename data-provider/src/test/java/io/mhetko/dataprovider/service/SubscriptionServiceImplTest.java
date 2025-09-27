@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
@@ -34,11 +35,13 @@ class SubscriptionServiceImplTest {
     void shouldAddSubscriptionForUser() {
         String username = "testuser";
         String symbol = "btc";
+        BigDecimal threshold = BigDecimal.valueOf(123.45);
         AppUser user = new AppUser();
         Subscription sub = new Subscription();
         sub.setUser(user);
         sub.setSymbol("BTC");
         sub.setActive(true);
+        sub.setThreshold(threshold);
         SubscriptionDto dto = new SubscriptionDto();
 
         when(appUserRepository.findByUsername(username)).thenReturn(Optional.of(user));
@@ -46,7 +49,7 @@ class SubscriptionServiceImplTest {
         when(subscriptionRepository.save(any())).thenReturn(sub);
         when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        SubscriptionDto result = service.addSubscription(username, symbol);
+        SubscriptionDto result = service.addSubscription(username, symbol, threshold);
 
         assertThat(result).isSameAs(dto);
         verify(subscriptionRepository).save(any());
@@ -56,6 +59,7 @@ class SubscriptionServiceImplTest {
     void shouldReturnExistingSubscriptionIfExists() {
         String username = "testuser";
         String symbol = "eth";
+        BigDecimal threshold = BigDecimal.valueOf(99.99);
         Subscription sub = new Subscription();
         SubscriptionDto dto = new SubscriptionDto();
         AppUser user = new AppUser();
@@ -65,7 +69,7 @@ class SubscriptionServiceImplTest {
         when(subscriptionRepository.findByUserIdAndSymbol(user.getId(), "ETH")).thenReturn(Optional.of(sub));
         when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        SubscriptionDto result = service.addSubscription(username, symbol);
+        SubscriptionDto result = service.addSubscription(username, symbol, threshold);
 
         assertThat(result).isSameAs(dto);
         verify(subscriptionRepository, never()).save(any());
@@ -74,9 +78,10 @@ class SubscriptionServiceImplTest {
     @Test
     void shouldThrowIfUserNotFound() {
         String username = "testuser";
+        BigDecimal threshold = BigDecimal.ZERO;
         when(appUserRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.addSubscription(username, "btc"))
+        assertThatThrownBy(() -> service.addSubscription(username, "btc", threshold))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -140,5 +145,20 @@ class SubscriptionServiceImplTest {
 
         assertThatThrownBy(() -> service.getUserSubscriptions(username))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldFindActiveSubscriptionsBySymbol() {
+        String symbol = "btc";
+        String normalized = "BTC";
+        Subscription sub1 = new Subscription();
+        Subscription sub2 = new Subscription();
+
+        when(subscriptionRepository.findBySymbolAndActiveTrue(normalized)).thenReturn(List.of(sub1, sub2));
+
+        List<Subscription> result = service.findActiveBySymbol(symbol);
+
+        assertThat(result).containsExactly(sub1, sub2);
+        verify(subscriptionRepository).findBySymbolAndActiveTrue(normalized);
     }
 }
