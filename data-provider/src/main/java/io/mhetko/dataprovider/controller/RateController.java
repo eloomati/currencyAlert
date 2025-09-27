@@ -3,7 +3,6 @@ package io.mhetko.dataprovider.controller;
 import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import io.mhetko.dataprovider.service.ExchangeRateHistoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

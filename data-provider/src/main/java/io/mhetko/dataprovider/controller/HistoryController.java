@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/history")
@@ -15,7 +16,7 @@ public class HistoryController {
     private final ExchangeRateHistoryService historyService;
 
     @GetMapping("/{base}")
-    public List<ExchangeRateHistoryEntity> getHistory(@PathVariable String base) {
-        return historyService.getHistoryByBase(base);
+    public Map<String, List<ExchangeRateHistoryEntity>> getHistory(@PathVariable String base) {
+        return historyService.getHistoryByBaseGrouped(base);
     }
 }

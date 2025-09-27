@@ -7,8 +7,10 @@ import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import io.mhetko.dataprovider.repository.ExchangeRateHistoryRepository;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +28,10 @@ public class ExchangeRateHistoryService {
                 .findTop2BySymbolOrderByAsOfDesc(symbol);
     }
 
-    public List<ExchangeRateHistoryEntity> getHistoryByBase(String base) {
-        return exchangeRateHistoryRepository.findByBaseOrderByAsOfDesc(base.toUpperCase());
+    public Map<String, List<ExchangeRateHistoryEntity>> getHistoryByBaseGrouped(String base) {
+        return exchangeRateHistoryRepository.findByBaseOrderByAsOfDesc(base.toUpperCase())
+                .stream()
+                .collect(Collectors.groupingBy(ExchangeRateHistoryEntity::getSymbol));
     }
 
     public List<ExchangeRateHistoryEntity> getLatestRatesByBase(String base) {

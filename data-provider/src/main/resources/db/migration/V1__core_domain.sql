@@ -66,14 +66,3 @@ CREATE TABLE IF NOT EXISTS exchange_rate_history
     ingested_at TIMESTAMPTZ      NOT NULL DEFAULT now(),
     UNIQUE (base, symbol, as_of)
 );
-
-
-CREATE TABLE IF NOT EXISTS message_outbox
-(
-    id             UUID PRIMARY KEY,
-    aggregate_type TEXT        NOT NULL,
-    aggregate_id   UUID        NOT NULL,
-    payload        JSONB       NOT NULL,
-    created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
-    sent_at        TIMESTAMPTZ NULL
-);
