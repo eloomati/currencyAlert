@@ -24,14 +24,14 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Transactional
     @Override
-    public SubscriptionDto addSubscription(UUID userId, String symbol) {
-        AppUser user = appUserRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + userId));
+    public SubscriptionDto addSubscription(String username, String symbol) {
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
 
         String normalized = normalizeSymbol(symbol);
 
-        if (subscriptionRepository.existsByUserIdAndSymbol(userId, normalized)) {
-            return subscriptionRepository.findByUserIdAndSymbol(userId, normalized)
+        if (subscriptionRepository.existsByUserIdAndSymbol(user.getId(), normalized)) {
+            return subscriptionRepository.findByUserIdAndSymbol(user.getId(), normalized)
                     .map(subscriptionMapper::toDto)
                     .orElseThrow();
         }
@@ -47,8 +47,11 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Transactional
     @Override
     public void removeSubscription(UUID subscriptionId) {
-        if (subscriptionRepository.existsById(subscriptionId)) {
-            subscriptionRepository.deleteById(subscriptionId);
+        Subscription s = subscriptionRepository.findById(subscriptionId)
+                .orElseThrow(() -> new EntityNotFoundException("Subscription not found: " + subscriptionId));
+        if (s.isActive()) {
+            s.setActive(false);
+            subscriptionRepository.save(s);
         }
     }
 
@@ -67,8 +70,10 @@ public class SubscriptionServiceImpl implements SubscriptionService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<SubscriptionDto> getUserSubscriptions(UUID userId) {
-        return subscriptionRepository.findByUserId(userId)
+    public List<SubscriptionDto> getUserSubscriptions(String username) {
+        AppUser user = appUserRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + username));
+        return subscriptionRepository.findByUserId(user.getId())
                 .stream()
                 .map(subscriptionMapper::toDto)
                 .toList();

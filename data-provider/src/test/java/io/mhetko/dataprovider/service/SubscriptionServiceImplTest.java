@@ -32,7 +32,7 @@ class SubscriptionServiceImplTest {
 
     @Test
     void shouldAddSubscriptionForUser() {
-        UUID userId = UUID.randomUUID();
+        String username = "testuser";
         String symbol = "btc";
         AppUser user = new AppUser();
         Subscription sub = new Subscription();
@@ -41,12 +41,12 @@ class SubscriptionServiceImplTest {
         sub.setActive(true);
         SubscriptionDto dto = new SubscriptionDto();
 
-        when(appUserRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(subscriptionRepository.existsByUserIdAndSymbol(userId, "BTC")).thenReturn(false);
+        when(appUserRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(subscriptionRepository.existsByUserIdAndSymbol(user.getId(), "BTC")).thenReturn(false);
         when(subscriptionRepository.save(any())).thenReturn(sub);
         when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        SubscriptionDto result = service.addSubscription(userId, symbol);
+        SubscriptionDto result = service.addSubscription(username, symbol);
 
         assertThat(result).isSameAs(dto);
         verify(subscriptionRepository).save(any());
@@ -54,18 +54,18 @@ class SubscriptionServiceImplTest {
 
     @Test
     void shouldReturnExistingSubscriptionIfExists() {
-        UUID userId = UUID.randomUUID();
+        String username = "testuser";
         String symbol = "eth";
         Subscription sub = new Subscription();
         SubscriptionDto dto = new SubscriptionDto();
         AppUser user = new AppUser();
 
-        when(appUserRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(subscriptionRepository.existsByUserIdAndSymbol(userId, "ETH")).thenReturn(true);
-        when(subscriptionRepository.findByUserIdAndSymbol(userId, "ETH")).thenReturn(Optional.of(sub));
+        when(appUserRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(subscriptionRepository.existsByUserIdAndSymbol(user.getId(), "ETH")).thenReturn(true);
+        when(subscriptionRepository.findByUserIdAndSymbol(user.getId(), "ETH")).thenReturn(Optional.of(sub));
         when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        SubscriptionDto result = service.addSubscription(userId, symbol);
+        SubscriptionDto result = service.addSubscription(username, symbol);
 
         assertThat(result).isSameAs(dto);
         verify(subscriptionRepository, never()).save(any());
@@ -73,86 +73,72 @@ class SubscriptionServiceImplTest {
 
     @Test
     void shouldThrowIfUserNotFound() {
-        UUID userId = UUID.randomUUID();
-        when(appUserRepository.findById(userId)).thenReturn(Optional.empty());
+        String username = "testuser";
+        when(appUserRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.addSubscription(userId, "btc"))
+        assertThatThrownBy(() -> service.addSubscription(username, "btc"))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void shouldRemoveSubscriptionIfExists() {
-        UUID subId = UUID.randomUUID();
-        when(subscriptionRepository.existsById(subId)).thenReturn(true);
-
-        service.removeSubscription(subId);
-
-        verify(subscriptionRepository).deleteById(subId);
-    }
-
-    @Test
-    void shouldNotRemoveSubscriptionIfNotExists() {
-        UUID subId = UUID.randomUUID();
-        when(subscriptionRepository.existsById(subId)).thenReturn(false);
-
-        service.removeSubscription(subId);
-
-        verify(subscriptionRepository, never()).deleteById(any());
-    }
-
-    @Test
-    void shouldUpdateSubscriptionActiveStatus() {
-        UUID subId = UUID.randomUUID();
-        Subscription sub = new Subscription();
-        sub.setActive(false);
-        SubscriptionDto dto = new SubscriptionDto();
-
-        when(subscriptionRepository.findById(subId)).thenReturn(Optional.of(sub));
-        when(subscriptionRepository.save(sub)).thenReturn(sub);
-        when(subscriptionMapper.toDto(sub)).thenReturn(dto);
-
-        SubscriptionDto result = service.updateSubscription(subId, true);
-
-        assertThat(sub.isActive()).isTrue();
-        assertThat(result).isSameAs(dto);
-    }
-
-    @Test
-    void shouldReturnSubscriptionUnchangedIfStatusSame() {
+    void shouldSoftRemoveSubscriptionIfActive() {
         UUID subId = UUID.randomUUID();
         Subscription sub = new Subscription();
         sub.setActive(true);
-        SubscriptionDto dto = new SubscriptionDto();
 
         when(subscriptionRepository.findById(subId)).thenReturn(Optional.of(sub));
-        when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        SubscriptionDto result = service.updateSubscription(subId, true);
+        service.removeSubscription(subId);
 
-        assertThat(result).isSameAs(dto);
+        assertThat(sub.isActive()).isFalse();
+        verify(subscriptionRepository).save(sub);
+    }
+
+    @Test
+    void shouldNotRemoveSubscriptionIfAlreadyInactive() {
+        UUID subId = UUID.randomUUID();
+        Subscription sub = new Subscription();
+        sub.setActive(false);
+
+        when(subscriptionRepository.findById(subId)).thenReturn(Optional.of(sub));
+
+        service.removeSubscription(subId);
+
         verify(subscriptionRepository, never()).save(any());
     }
 
     @Test
-    void shouldThrowIfSubscriptionNotFoundOnUpdate() {
+    void shouldThrowIfSubscriptionNotFoundOnRemove() {
         UUID subId = UUID.randomUUID();
         when(subscriptionRepository.findById(subId)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.updateSubscription(subId, true))
+        assertThatThrownBy(() -> service.removeSubscription(subId))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void shouldReturnUserSubscriptions() {
-        UUID userId = UUID.randomUUID();
+    void shouldReturnUserSubscriptionsByUsername() {
+        String username = "testuser";
+        AppUser user = new AppUser();
+        user.setId(UUID.randomUUID());
         Subscription sub = new Subscription();
         SubscriptionDto dto = new SubscriptionDto();
 
-        when(subscriptionRepository.findByUserId(userId)).thenReturn(List.of(sub));
+        when(appUserRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(subscriptionRepository.findByUserId(user.getId())).thenReturn(List.of(sub));
         when(subscriptionMapper.toDto(sub)).thenReturn(dto);
 
-        List<SubscriptionDto> result = service.getUserSubscriptions(userId);
+        List<SubscriptionDto> result = service.getUserSubscriptions(username);
 
         assertThat(result).containsExactly(dto);
+    }
+
+    @Test
+    void shouldThrowIfUserNotFoundOnGetSubscriptions() {
+        String username = "testuser";
+        when(appUserRepository.findByUsername(username)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.getUserSubscriptions(username))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

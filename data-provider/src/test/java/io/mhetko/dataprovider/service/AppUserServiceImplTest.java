@@ -33,7 +33,7 @@ class AppUserServiceImplTest {
     @Test
     void shouldFindByUsername() {
         AppUser user = new AppUser();
-        when(userRepository.findByUsername("test")).thenReturn(user);
+        when(userRepository.findByUsername("test")).thenReturn(java.util.Optional.of(user));
 
         AppUser result = service.findByUsername("test");
 
