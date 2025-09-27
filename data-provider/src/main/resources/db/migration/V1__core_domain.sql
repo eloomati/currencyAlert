@@ -7,6 +7,17 @@ CREATE TABLE IF NOT EXISTS users (
                                      role TEXT NOT NULL DEFAULT 'USER'
 );
 
+CREATE TABLE IF NOT EXISTS roles (
+                                     id UUID PRIMARY KEY,
+                                     name TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_role (
+                                         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                         role_id UUID NOT NULL REFERENCES roles(id) ON DELETE CASCADE,
+                                         PRIMARY KEY (user_id, role_id)
+);
+
 
 CREATE TABLE IF NOT EXISTS subscriptions (
                                              id UUID PRIMARY KEY,
