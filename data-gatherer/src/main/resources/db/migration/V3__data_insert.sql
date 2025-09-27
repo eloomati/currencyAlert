@@ -1,6 +1,6 @@
-INSERT INTO currencies (code) VALUES
-                                      ('PLN'),
-                                      ('USD'),
-                                      ('GBP'),
-                                      ('EUR'),
-                                      ('CHF');
+INSERT INTO currencies (code)
+VALUES ('PLN'),
+       ('USD'),
+       ('GBP'),
+       ('EUR'),
+       ('CHF');

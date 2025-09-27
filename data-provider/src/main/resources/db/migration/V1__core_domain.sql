@@ -17,29 +17,30 @@ CREATE TABLE IF NOT EXISTS roles
 
 CREATE TABLE IF NOT EXISTS user_role
 (
-    user_id UUID NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    user_id UUID      NOT NULL REFERENCES users (id) ON DELETE CASCADE,
     role_id BIGSERIAL NOT NULL REFERENCES roles (id) ON DELETE CASCADE,
     PRIMARY KEY (user_id, role_id)
 );
 
-CREATE TABLE IF NOT EXISTS tokens (
-                                      id UUID PRIMARY KEY,
-                                      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-                                      token TEXT NOT NULL UNIQUE,
-                                      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-                                      expired BOOLEAN NOT NULL DEFAULT false,
-                                      revoked BOOLEAN NOT NULL DEFAULT false
+CREATE TABLE IF NOT EXISTS tokens
+(
+    id         UUID PRIMARY KEY,
+    user_id    UUID        NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    token      TEXT        NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    expired    BOOLEAN     NOT NULL DEFAULT false,
+    revoked    BOOLEAN     NOT NULL DEFAULT false
 );
 
 
 CREATE TABLE IF NOT EXISTS subscriptions
 (
-    id                UUID PRIMARY KEY,
-    user_id           UUID          NOT NULL REFERENCES users (id),
-    symbol            TEXT          NOT NULL,
-    is_active         BOOLEAN       NOT NULL DEFAULT true,
-    created_at        TIMESTAMPTZ   NOT NULL DEFAULT now(),
-    threshold         NUMERIC(8,4)  NOT NULL DEFAULT 0.0
+    id         UUID PRIMARY KEY,
+    user_id    UUID          NOT NULL REFERENCES users (id),
+    symbol     TEXT          NOT NULL,
+    is_active  BOOLEAN       NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    threshold  NUMERIC(8, 4) NOT NULL DEFAULT 0.0
 );
 
 
