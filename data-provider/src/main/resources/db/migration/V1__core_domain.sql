@@ -22,6 +22,15 @@ CREATE TABLE IF NOT EXISTS user_role
     PRIMARY KEY (user_id, role_id)
 );
 
+CREATE TABLE IF NOT EXISTS tokens (
+                                      id UUID PRIMARY KEY,
+                                      user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+                                      token TEXT NOT NULL UNIQUE,
+                                      created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                      expired BOOLEAN NOT NULL DEFAULT false,
+                                      revoked BOOLEAN NOT NULL DEFAULT false
+);
+
 
 CREATE TABLE IF NOT EXISTS subscriptions
 (

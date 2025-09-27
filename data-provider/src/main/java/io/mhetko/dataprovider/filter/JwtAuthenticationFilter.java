@@ -1,9 +1,8 @@
-package io.mhetko.moduly_specjalistyczne_spring.filters;
+package io.mhetko.dataprovider.filter;
 
-import io.mhetko.moduly_specjalistyczne_spring.service.JwtService;
+import io.mhetko.dataprovider.service.JwtService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import io.mhetko.moduly_specjalistyczne_spring.service.JwtService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,10 +11,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.filter.OncePerRequestFilter;
-import io.mhetko.moduly_specjalistyczne_spring.repository.TokenRepository;
+import io.mhetko.dataprovider.repository.TokenRepository;
 
 import java.io.IOException;
 

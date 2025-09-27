@@ -37,7 +37,7 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public void saveUser(AppUser user) {
         user.setPasswordHash(passwordEncoder.encode(user.getPasswordHash()));
-        user.setIsActive(true);
+        user.setActive(true);
         Role userRole = roleRepository.findByName("USER");
         user.setRoles(new HashSet<>(Arrays.asList(userRole)));
         userRepository.save(user);

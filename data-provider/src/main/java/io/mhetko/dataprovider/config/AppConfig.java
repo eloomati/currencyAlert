@@ -1,5 +1,8 @@
 package io.mhetko.dataprovider.config;
 
+import io.mhetko.dataprovider.repository.TokenRepository;
+import io.mhetko.dataprovider.service.JwtService;
+import io.mhetko.dataprovider.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,10 +13,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class AppConfig {
 
-    private final SpringDataUserDetailsService userDetailsService;
+    private final UserDetailsService userDetailsService;
     public final PasswordEncoder passwordEncoder;
 
-    public ApplicationConfiguration(SpringDataUserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
+    public AppConfig(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -29,11 +32,11 @@ public class AppConfig {
     }
 
     @Bean
-    public io.mhetko.moduly_specjalistyczne_spring.filters.JwtAuthenticationFilter jwtAuthenticationFilter(
+    public JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
-            io.mhetko.moduly_specjalistyczne_spring.repository.TokenRepository tokenRepository) {
-        return new io.mhetko.moduly_specjalistyczne_spring.filters.JwtAuthenticationFilter(jwtService, userDetailsService, tokenRepository);
+            TokenRepository tokenRepository) {
+        return new JwtAuthenticationFilter(jwtService, userDetailsService, tokenRepository);
     }
 
 }
