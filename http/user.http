@@ -1,0 +1,27 @@
+### Tworzenie nowego użytkownika
+POST http://localhost:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "username": "nowyuser",
+  "email": "nowyuser@example.com",
+  "passwordHash": "haslo123",
+  "isActive": true,
+  "roles": [
+    { "id": 1, "name": "ROLE_USER" }
+  ]
+}
+
+### Logowanie i pobranie tokena JWT
+POST http://localhost:8080/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "username": "nowyuser",
+  "password": "haslo123"
+}
+
+### Odświeżenie tokena JWT
+POST http://localhost:8080/api/v1/auth/refresh-token
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk4ODA1MCwiZXhwIjoxNzU4OTg4OTUwfQ.MWvGkk2ynJjeUUqGpS808Kf8114Z7dilS0BpaO9IO_Y
+Content-Type: application/json

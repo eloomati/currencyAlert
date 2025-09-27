@@ -11,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
-import java.util.UUID;
 
 @Entity
 @Data
@@ -19,7 +18,7 @@ import java.util.UUID;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private UUID id;
+    private Long id;
     @Enumerated(EnumType.STRING)
     @Column(unique = true, nullable = false)
     private RoleName name;

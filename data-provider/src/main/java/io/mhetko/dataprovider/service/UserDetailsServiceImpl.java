@@ -1,6 +1,7 @@
 package io.mhetko.dataprovider.service;
 
 import io.mhetko.dataprovider.model.AppUser;
+import io.mhetko.dataprovider.model.CurrentUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -31,7 +32,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toSet());
 
-        return new org.springframework.security.core.userdetails.User(
+        return new CurrentUser(
+                user,
                 user.getUsername(),
                 user.getPasswordHash(),
                 user.isActive(),
