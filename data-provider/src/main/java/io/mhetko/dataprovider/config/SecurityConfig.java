@@ -26,9 +26,15 @@ public class SecurityConfig {
 
     private static final String[] ALLOWED_LIST_URL = {
             "/api/v1/auth/**",
-            "/h2-console/**",
+            "/api/v1/users/**",
             "/rabbit/**",
-            "/api/test/email"
+            "/api/test/email",
+            "/api/test/notification/**",
+            "/api/rate/**",
+            "/api/history/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/v3/api-docs/**"
     };
 
     @Bean
@@ -55,13 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(ALLOWED_LIST_URL).permitAll()
                         .requestMatchers("/api/subscriptions/**").authenticated()
-                        .requestMatchers("/posts/delete").hasAnyRole("MODERATOR", "ADMIN")
-                        .requestMatchers("/posts/update").hasRole("USER")
-                        .requestMatchers("/posts/**").authenticated()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/moderator/**").hasRole("MODERATOR")
-                        .requestMatchers("/api/restricted/**").authenticated()
-                        .anyRequest().permitAll()
+                        .anyRequest().denyAll()
                 )
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

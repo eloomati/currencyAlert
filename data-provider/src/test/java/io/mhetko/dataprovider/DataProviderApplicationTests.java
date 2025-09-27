@@ -1,4 +1,4 @@
-package io.mhetko.currencyalert;
+package io.mhetko.dataprovider;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

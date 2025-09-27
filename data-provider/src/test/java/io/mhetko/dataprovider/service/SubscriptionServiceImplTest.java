@@ -154,11 +154,11 @@ class SubscriptionServiceImplTest {
         Subscription sub1 = new Subscription();
         Subscription sub2 = new Subscription();
 
-        when(subscriptionRepository.findBySymbolAndActiveTrue(normalized)).thenReturn(List.of(sub1, sub2));
+        when(subscriptionRepository.findBySymbolAndIsActiveTrue(normalized)).thenReturn(List.of(sub1, sub2));
 
         List<Subscription> result = service.findActiveBySymbol(symbol);
 
         assertThat(result).containsExactly(sub1, sub2);
-        verify(subscriptionRepository).findBySymbolAndActiveTrue(normalized);
+        verify(subscriptionRepository).findBySymbolAndIsActiveTrue(normalized);
     }
 }
