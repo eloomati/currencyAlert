@@ -1,6 +1,7 @@
 package io.mhetko.dataprovider.service;
 
 import io.mhetko.dataprovider.dto.SubscriptionDto;
+import io.mhetko.dataprovider.model.Subscription;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,4 +12,5 @@ public interface SubscriptionService {
     void removeSubscription(UUID subscriptionId);
     SubscriptionDto updateSubscription(UUID subscriptionId, boolean isActive, BigDecimal threshold);
     List<SubscriptionDto> getUserSubscriptions(String username);
+    List<Subscription> findActiveBySymbol(String symbol);
 }

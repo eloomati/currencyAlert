@@ -86,6 +86,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public List<Subscription> findActiveBySymbol(String symbol) {
+        String normalized = normalizeSymbol(symbol);
+        return subscriptionRepository.findBySymbolAndActiveTrue(normalized);
+    }
+
     private static String normalizeSymbol(String symbol) {
         if (symbol == null || symbol.isBlank()) {
             throw new IllegalArgumentException("Symbol must not be blank");

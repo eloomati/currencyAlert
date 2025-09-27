@@ -11,4 +11,5 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, UUID
     List<Subscription> findByUserId(UUID userId);
     boolean existsByUserIdAndSymbol(UUID userId, String symbol);
     Optional<Subscription> findByUserIdAndSymbol(UUID userId, String symbol);
+    List<Subscription> findBySymbolAndActiveTrue(String symbol);
 }

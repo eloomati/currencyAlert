@@ -32,7 +32,7 @@ POST http://localhost:8080/api/subscriptions
 Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NzM4MSwiZXhwIjoxNzU4OTk4MjgxfQ.ATAuxU14_F7zdQsBp7bEgLMv7MYiDbcCNYbapGXqthw
 Content-Type: application/x-www-form-urlencoded
 
-symbol=btc&threshold=100.00
+symbol=pln&threshold=100.00
 
 ### Usunięcie subskrypcji (soft delete)
 DELETE http://localhost:8080/api/subscriptions/9aabd5ac-7c7a-4bbd-ac93-c970b5c6ad21

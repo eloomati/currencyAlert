@@ -146,4 +146,19 @@ class SubscriptionServiceImplTest {
         assertThatThrownBy(() -> service.getUserSubscriptions(username))
                 .isInstanceOf(EntityNotFoundException.class);
     }
+
+    @Test
+    void shouldFindActiveSubscriptionsBySymbol() {
+        String symbol = "btc";
+        String normalized = "BTC";
+        Subscription sub1 = new Subscription();
+        Subscription sub2 = new Subscription();
+
+        when(subscriptionRepository.findBySymbolAndActiveTrue(normalized)).thenReturn(List.of(sub1, sub2));
+
+        List<Subscription> result = service.findActiveBySymbol(symbol);
+
+        assertThat(result).containsExactly(sub1, sub2);
+        verify(subscriptionRepository).findBySymbolAndActiveTrue(normalized);
+    }
 }
