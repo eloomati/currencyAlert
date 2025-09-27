@@ -12,13 +12,3 @@ CREATE TABLE IF NOT EXISTS gatherer_last_rates (
                                                    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
                                                    UNIQUE (base_id, target_id)
 );
-
-CREATE TABLE IF NOT EXISTS exchange_rate_history (
-                                                     id UUID PRIMARY KEY,
-                                                     base TEXT NOT NULL,
-                                                     symbol TEXT NOT NULL,
-                                                     rate NUMERIC(18,8) NOT NULL,
-                                                     as_of TIMESTAMPTZ NOT NULL,
-                                                     ingested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-                                                     UNIQUE(base, symbol, as_of)
-);

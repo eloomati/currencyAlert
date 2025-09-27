@@ -1,15 +1,16 @@
 package io.mhetko.datagatherer.service;
 
-import io.mhetko.datagatherer.repository.ExchangeRateHistoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
 @RequiredArgsConstructor
 public class ChangeAnalyzerService {
 
-    private final ExchangeRateHistoryRepository exchangeRateHistoryRepository;
+    private final RateCacheService rateCacheService;
 
     /**
      * Sprawdza, czy zmiana kursu przekroczyła zadany próg.
@@ -19,15 +20,14 @@ public class ChangeAnalyzerService {
      * @return true jeśli zmiana przekracza próg, false w przeciwnym razie
      */
     public boolean hasRateChanged(String base, String symbol, double threshold) {
-        var rates = exchangeRateHistoryRepository
-                .findTop2ByBaseAndSymbolOrderByAsOfDesc(base, symbol);
+        List<Double> rates = rateCacheService.getLastRates(base, symbol);
 
-        if (rates.size() < 2) {
-            return false; 
+        if (rates == null || rates.size() < 2) {
+            return false;
         }
 
-        double last = rates.get(0).getRate();
-        double previous = rates.get(1).getRate();
+        double last = rates.get(0);
+        double previous = rates.get(1);
         double change = Math.abs(last - previous);
 
         return change > threshold;

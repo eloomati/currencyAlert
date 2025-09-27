@@ -1,6 +1,6 @@
-package io.mhetko.datagatherer.repository;
+package io.mhetko.dataprovider.repository;
 
-import io.mhetko.datagatherer.model.ExchangeRateHistoryEntity;
+import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

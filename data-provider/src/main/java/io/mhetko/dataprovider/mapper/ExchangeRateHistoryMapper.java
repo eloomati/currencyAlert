@@ -1,7 +1,7 @@
-package io.mhetko.datagatherer.mapper;
+package io.mhetko.dataprovider.mapper;
 
-import io.mhetko.datagatherer.dto.ExchangeRateHistoryDto;
-import io.mhetko.datagatherer.model.ExchangeRateHistoryEntity;
+import io.mhetko.dataprovider.dto.ExchangeRateHistoryDto;
+import io.mhetko.dataprovider.model.ExchangeRateHistoryEntity;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

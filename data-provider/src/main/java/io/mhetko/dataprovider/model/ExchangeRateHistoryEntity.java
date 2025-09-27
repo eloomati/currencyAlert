@@ -1,4 +1,4 @@
-package io.mhetko.datagatherer.model;
+package io.mhetko.dataprovider.model;
 
 import jakarta.persistence.*;
 import lombok.*;

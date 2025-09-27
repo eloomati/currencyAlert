@@ -1,14 +1,11 @@
 package io.mhetko.datagatherer.service;
 
 import io.mhetko.datagatherer.model.CurrencyEntity;
-import io.mhetko.datagatherer.model.ExchangeRateHistoryEntity;
 import io.mhetko.datagatherer.model.RateEntity;
 import io.mhetko.datagatherer.provider.OpenExchangeRatesClient;
 import io.mhetko.datagatherer.repository.CurrencyRepository;
-import io.mhetko.datagatherer.repository.ExchangeRateHistoryRepository;
 import io.mhetko.datagatherer.repository.RateRepository;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -26,12 +23,11 @@ import static org.mockito.Mockito.*;
 class CurrentUpdateServiceTest {
 
     @Mock private RateRepository rateRepository;
-    @Mock private ExchangeRateHistoryRepository exchangeRateHistoryRepository;
+    @Mock private RateCacheService rateCacheService;
     @Mock private CurrencyRepository currencyRepository;
     @Mock private OpenExchangeRatesClient openExchangeRatesClient;
 
     @Captor private ArgumentCaptor<RateEntity> rateCaptor;
-    @Captor private ArgumentCaptor<ExchangeRateHistoryEntity> historyCaptor;
 
     private CurrentUpdateService service;
 
@@ -39,7 +35,7 @@ class CurrentUpdateServiceTest {
     void setUp() {
         service = new CurrentUpdateService(
                 rateRepository,
-                exchangeRateHistoryRepository,
+                rateCacheService,
                 currencyRepository,
                 openExchangeRatesClient
         );
@@ -64,10 +60,8 @@ class CurrentUpdateServiceTest {
                 .build();
     }
 
-
     @Test
-    void saveNewRate_createsEntityAndHistory() {
-        // given
+    void saveNewRate_createsEntityAndCache() {
         String base = "EUR", symbol = "PLN";
         double rate = 4.3210;
         OffsetDateTime asOf = OffsetDateTime.parse("2024-01-01T12:00:00Z");
@@ -75,12 +69,11 @@ class CurrentUpdateServiceTest {
         when(currencyRepository.findByCode(base)).thenReturn(Optional.of(currency(base)));
         when(currencyRepository.findByCode(symbol)).thenReturn(Optional.of(currency(symbol)));
         when(rateRepository.findByBaseAndTarget(any(), any())).thenReturn(Optional.empty());
-
-        // when
         when(openExchangeRatesClient.latest(eq(base), any())).thenReturn(Map.of(symbol, rate));
+
         service.fetchAndSaveRates(base, List.of(symbol), asOf);
 
-        // then
+        verify(rateCacheService).saveRate(base, symbol, rate);
         verify(rateRepository).save(rateCaptor.capture());
         RateEntity saved = rateCaptor.getValue();
         assertThat(saved.getId()).isNull();
@@ -89,20 +82,10 @@ class CurrentUpdateServiceTest {
         assertThat(saved.getRate()).isEqualTo(rate);
         assertThat(saved.getAsOf()).isEqualTo(asOf);
         assertThat(saved.getUpdatedAt()).isNotNull();
-
-        verify(exchangeRateHistoryRepository).save(historyCaptor.capture());
-        ExchangeRateHistoryEntity hist = historyCaptor.getValue();
-        assertThat(hist.getId()).isNotNull();
-        assertThat(hist.getBase()).isEqualTo(base);
-        assertThat(hist.getSymbol()).isEqualTo(symbol);
-        assertThat(hist.getRate()).isEqualTo(rate);
-        assertThat(hist.getAsOf()).isEqualTo(asOf);
-        assertThat(hist.getIngestedAt()).isNotNull();
     }
 
     @Test
-    void saveExistingRate_updatesEntityAndHistory() {
-        // given
+    void saveExistingRate_updatesEntityAndCache() {
         String base = "EUR", symbol = "USD";
         OffsetDateTime oldAsOf = OffsetDateTime.parse("2024-01-01T00:00:00Z");
         OffsetDateTime newAsOf = OffsetDateTime.parse("2024-02-01T00:00:00Z");
@@ -114,17 +97,14 @@ class CurrentUpdateServiceTest {
         when(currencyRepository.findByCode(base)).thenReturn(Optional.of(baseC));
         when(currencyRepository.findByCode(symbol)).thenReturn(Optional.of(symC));
         when(rateRepository.findByBaseAndTarget(baseC, symC)).thenReturn(Optional.of(existing));
-
         double newRate = 1.10;
         when(openExchangeRatesClient.latest(eq(base), any())).thenReturn(Map.of(symbol, newRate));
 
-        // when
         service.fetchAndSaveRates(base, List.of(symbol), newAsOf);
 
-        // then
+        verify(rateCacheService).saveRate(base, symbol, newRate);
         verify(rateRepository).save(rateCaptor.capture());
         RateEntity saved = rateCaptor.getValue();
-
         assertThat(saved.getId()).isEqualTo(existing.getId());
         assertThat(saved.getBase()).isSameAs(baseC);
         assertThat(saved.getTarget()).isSameAs(symC);
@@ -132,24 +112,20 @@ class CurrentUpdateServiceTest {
         assertThat(saved.getAsOf()).isEqualTo(newAsOf);
         assertThat(saved.getUpdatedAt()).isNotNull();
         assertThat(saved.getUpdatedAt()).isAfterOrEqualTo(newAsOf.minusSeconds(1));
-
-        verify(exchangeRateHistoryRepository).save(any(ExchangeRateHistoryEntity.class));
     }
 
     @Test
     void missingCurrency_throws() {
-        // given
         String base = "EUR", symbol = "PLN";
         when(currencyRepository.findByCode(base)).thenReturn(Optional.empty());
         when(openExchangeRatesClient.latest(eq(base), any())).thenReturn(Map.of(symbol, 4.2));
 
-        // when / then
         assertThatThrownBy(this::callFetchAndSaveRatesWithNow)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("Base currency not found:");
 
         verify(rateRepository, never()).save(any());
-        verify(exchangeRateHistoryRepository, never()).save(any());
+        verify(rateCacheService, never()).saveRate(any(), any(), anyDouble());
     }
 
     private void callFetchAndSaveRatesWithNow() {
@@ -158,7 +134,6 @@ class CurrentUpdateServiceTest {
 
     @Test
     void fetchAndSaveRates_savesAllReturnedSymbols() {
-        // given
         String base = "EUR";
         var asOf = OffsetDateTime.parse("2024-03-01T00:00:00Z");
 
@@ -174,47 +149,29 @@ class CurrentUpdateServiceTest {
         when(currencyRepository.findByCode("USD")).thenReturn(Optional.of(usd));
         when(rateRepository.findByBaseAndTarget(any(), any())).thenReturn(Optional.empty());
 
-        // when
         service.fetchAndSaveRates(base, List.of("PLN", "USD"), asOf);
 
-        // then
         verify(rateRepository, times(2)).save(any(RateEntity.class));
-        verify(exchangeRateHistoryRepository, times(2)).save(any(ExchangeRateHistoryEntity.class));
+        verify(rateCacheService).saveRate(base, "PLN", 4.30);
+        verify(rateCacheService).saveRate(base, "USD", 1.10);
     }
-
 
     @Test
     void getLatestRate_returnsRateIfExists() {
-        //given
         String base = "EUR", symbol = "PLN";
         double rate = 4.25;
-        ExchangeRateHistoryEntity entity = ExchangeRateHistoryEntity.builder()
-                .base(base)
-                .symbol(symbol)
-                .rate(rate)
-                .asOf(OffsetDateTime.now())
-                .build();
+        when(rateCacheService.getLastRates(base, symbol)).thenReturn(List.of(rate));
 
-        //when
-        when(exchangeRateHistoryRepository.findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol))
-                .thenReturn(Optional.of(entity));
-
-        //then
         Double result = service.getLatestRate(base, symbol);
 
         assertThat(result).isEqualTo(rate);
     }
 
-
     @Test
     void getLatestRate_returnsNullIfNoData() {
-        //given
         String base = "EUR", symbol = "PLN";
-        //when
-        when(exchangeRateHistoryRepository.findTop1ByBaseAndSymbolOrderByAsOfDesc(base, symbol))
-                .thenReturn(Optional.empty());
+        when(rateCacheService.getLastRates(base, symbol)).thenReturn(List.of());
 
-        //then
         Double result = service.getLatestRate(base, symbol);
 
         assertThat(result).isNull();
