@@ -2,7 +2,6 @@ package io.mhetko.datagatherer;
 
 import io.mhetko.datagatherer.config.CurrencyProperties;
 import io.mhetko.datagatherer.config.ProviderProperties;
-import io.mhetko.datagatherer.config.RedisConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;

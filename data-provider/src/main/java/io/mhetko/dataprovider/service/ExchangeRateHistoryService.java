@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class HistoryService {
+public class ExchangeRateHistoryService {
 
     private final ExchangeRateHistoryRepository exchangeRateHistoryRepository;
 
