@@ -23,5 +23,25 @@ Content-Type: application/json
 
 ### Odświeżenie tokena JWT
 POST http://localhost:8080/api/v1/auth/refresh-token
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk4ODA1MCwiZXhwIjoxNzU4OTg4OTUwfQ.MWvGkk2ynJjeUUqGpS808Kf8114Z7dilS0BpaO9IO_Y
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5Mzk5MiwiZXhwIjoxNzU4OTk0ODkyfQ.sUSffjwQ2Yyq5Uv4Xk0AAZWXRr4t5z8fJD8OHvk1zlU
 Content-Type: application/json
+
+
+### Dodanie subskrypcji dla użytkownika
+POST http://localhost:8080/api/subscriptions
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
+Content-Type: application/x-www-form-urlencoded
+
+symbol=btc
+
+### Usunięcie subskrypcji (soft delete)
+DELETE http://localhost:8080/api/subscriptions/efc860dd-69c0-4a29-b86d-e3953d280957
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
+
+### Aktualizacja statusu subskrypcji
+PUT http://localhost:8080/api/subscriptions/efc860dd-69c0-4a29-b86d-e3953d280957?active=true
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA
+
+### Pobranie subskrypcji zalogowanego użytkownika
+GET http://localhost:8080/api/subscriptions/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJub3d5dXNlciIsImlhdCI6MTc1ODk5NDY4MiwiZXhwIjoxNzU4OTk1NTgyfQ.Tkf_Vg46bEF2utQJ9ftSG-U9P1tEbRKFRoCJI4aUWNA

@@ -18,7 +18,7 @@ public class RateCacheService {
     public void saveRate(String base, String symbol, double rate) {
         String key = getKey(base, symbol);
         redisTemplate.opsForList().leftPush(key, rate);
-        redisTemplate.opsForList().trim(key, 0, 1); // tylko 2 ostatnie wartości
+        redisTemplate.opsForList().trim(key, 0, 1);
     }
 
     public List<Double> getLastRates(String base, String symbol) {

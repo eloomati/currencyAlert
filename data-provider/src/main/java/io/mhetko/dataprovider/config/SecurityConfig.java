@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(ALLOWED_LIST_URL).permitAll()
+                        .requestMatchers("/api/subscriptions/**").authenticated()
                         .requestMatchers("/posts/delete").hasAnyRole("MODERATOR", "ADMIN")
                         .requestMatchers("/posts/update").hasRole("USER")
                         .requestMatchers("/posts/**").authenticated()
