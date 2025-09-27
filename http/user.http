@@ -61,3 +61,13 @@ Content-Type: application/json
   "rate": 9.50,
   "asOf": "2025-09-29T16:00:00Z"
 }
+
+### Pobierz najnowszy kurs USD
+GET http://localhost:8080/api/rate/USD
+Accept: application/json
+
+###
+
+### Pobierz historię kursów USD
+GET http://localhost:8080/api/history/USD
+Accept: application/json
