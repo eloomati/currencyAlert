@@ -1,4 +1,4 @@
-package io.mhetko.datagatherer.dto;
+package io.mhetko.dataprovider.dto;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

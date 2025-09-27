@@ -31,6 +31,16 @@ CREATE TABLE IF NOT EXISTS notifications (
                                              channel TEXT NOT NULL DEFAULT 'EMAIL'
 );
 
+CREATE TABLE IF NOT EXISTS exchange_rate_history (
+                                                     id UUID PRIMARY KEY,
+                                                     base TEXT NOT NULL,
+                                                     symbol TEXT NOT NULL,
+                                                     rate double precision NOT NULL,
+                                                     as_of TIMESTAMPTZ NOT NULL,
+                                                     ingested_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+                                                     UNIQUE(base, symbol, as_of)
+);
+
 
 CREATE TABLE IF NOT EXISTS message_outbox (
                                               id UUID PRIMARY KEY,

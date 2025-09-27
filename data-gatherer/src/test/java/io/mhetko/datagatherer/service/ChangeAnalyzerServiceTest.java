@@ -1,13 +1,10 @@
 package io.mhetko.datagatherer.service;
 
-import io.mhetko.datagatherer.model.ExchangeRateHistoryEntity;
-import io.mhetko.datagatherer.repository.ExchangeRateHistoryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,71 +14,67 @@ import static org.mockito.Mockito.*;
 class ChangeAnalyzerServiceTest {
 
     @Mock
-    private ExchangeRateHistoryRepository historyRepository;
+    private RateCacheService rateCacheService;
 
     private ChangeAnalyzerService service;
 
-    private ExchangeRateHistoryEntity h(double rate, String asOfIso) {
-        return ExchangeRateHistoryEntity.builder()
-                .rate(rate)
-                .asOf(OffsetDateTime.parse(asOfIso))
-                .build();
-    }
-
     private ChangeAnalyzerService sut() {
         if (service == null) {
-            service = new ChangeAnalyzerService(historyRepository);
+            service = new ChangeAnalyzerService(rateCacheService);
         }
         return service;
     }
 
     @Test
     void lessThanTwoRecords_returnsFalse() {
-        when(historyRepository.findTop2ByBaseAndSymbolOrderByAsOfDesc("EUR", "PLN"))
-                .thenReturn(List.of(h(4.20, "2024-01-01T12:00:00Z")));
+        // given
+        when(rateCacheService.getLastRates("EUR", "PLN"))
+                .thenReturn(List.of(4.20));
 
+        // when
         boolean changed = sut().hasRateChanged("EUR", "PLN", 0.05);
 
+        // then
         assertThat(changed).isFalse();
-        verify(historyRepository).findTop2ByBaseAndSymbolOrderByAsOfDesc("EUR", "PLN");
+        verify(rateCacheService).getLastRates("EUR", "PLN");
     }
 
     @Test
     void changeGreaterThanThreshold_returnsTrue() {
-        when(historyRepository.findTop2ByBaseAndSymbolOrderByAsOfDesc("EUR", "PLN"))
-                .thenReturn(List.of(
-                        h(4.50, "2024-01-02T12:00:00Z"),
-                        h(4.40, "2024-01-01T12:00:00Z")
-                ));
+        // given
+        when(rateCacheService.getLastRates("EUR", "PLN"))
+                .thenReturn(List.of(4.50, 4.40));
 
+        // when
         boolean changed = sut().hasRateChanged("EUR", "PLN", 0.05);
 
+        // then
         assertThat(changed).isTrue(); // 0.10 > 0.05
     }
 
     @Test
     void changeEqualToThreshold_returnsFalse() {
-        when(historyRepository.findTop2ByBaseAndSymbolOrderByAsOfDesc("EUR", "PLN"))
-                .thenReturn(List.of(
-                        h(4.50, "2024-01-02T12:00:00Z"),
-                        h(4.45, "2024-01-01T12:00:00Z")
-                ));
+        // given
+        when(rateCacheService.getLastRates("EUR", "PLN"))
+                .thenReturn(List.of(4.50, 4.45));
 
+        // when
         boolean changed = sut().hasRateChanged("EUR", "PLN", 0.05);
 
+        // then
         assertThat(changed).isFalse(); // 0.05 == threshold
     }
 
     @Test
     void downwardChange_greaterThanThreshold_returnsTrue() {
-        when(historyRepository.findTop2ByBaseAndSymbolOrderByAsOfDesc("EUR", "PLN"))
-                .thenReturn(List.of(
-                        h(4.30, "2024-01-02T12:00:00Z"),
-                        h(4.50, "2024-01-01T12:00:00Z")
-                ));
+        // given
+        when(rateCacheService.getLastRates("EUR", "PLN"))
+                .thenReturn(List.of(4.30, 4.50));
 
+        // when
         boolean changed = sut().hasRateChanged("EUR", "PLN", 0.15);
 
+        // then
         assertThat(changed).isTrue(); // |4.30 - 4.50| = 0.20 > 0.15
     }
 }
