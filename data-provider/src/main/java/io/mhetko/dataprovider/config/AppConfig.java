@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-
 @Configuration
 public class AppConfig {
 
@@ -30,12 +29,11 @@ public class AppConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter(
+    public io.mhetko.moduly_specjalistyczne_spring.filters.JwtAuthenticationFilter jwtAuthenticationFilter(
             JwtService jwtService,
             UserDetailsService userDetailsService,
             io.mhetko.moduly_specjalistyczne_spring.repository.TokenRepository tokenRepository) {
-        return new JwtAuthenticationFilter(jwtService, userDetailsService, tokenRepository);
+        return new io.mhetko.moduly_specjalistyczne_spring.filters.JwtAuthenticationFilter(jwtService, userDetailsService, tokenRepository);
     }
-
 
 }
