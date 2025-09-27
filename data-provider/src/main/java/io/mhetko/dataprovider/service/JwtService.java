@@ -9,18 +9,24 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Map;
 
 import java.security.Key;
 
 public class JwtService {
-    private static final String SECRET_KEY = "IdVrZuBdCVQNzJ5TOSEZIXnLYzqnIbtIm2QXjcqzXYHFdcm+Qa3qVXTd2qJc2C4tGKWWj9lc2JlrqoOPHpUEtg==";
-    private static final int EXPIRATION_TIME = 900000;
-    private static final int EXPIRATION_REFRESH_TIME = 86400000;
+    @Value("${jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${jwt.expiration-time}")
+    private int expirationTime;
+
+    @Value("${jwt.expiration-refresh-time}")
+    private int expirationRefreshTime;
 
     private Key getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -28,6 +34,7 @@ public class JwtService {
         return Jwts
                 .parserBuilder()
                 .setSigningKey(getKey())
+                .setAllowedClockSkewSeconds(1)
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
@@ -43,7 +50,7 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, EXPIRATION_TIME);
+        return generateToken(new HashMap<>(), userDetails, expirationTime);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails, long expiration) {
@@ -59,11 +66,12 @@ public class JwtService {
 
 
     public boolean isTokenValidAndNotExpired(String token, UserDetails userDetails) {
-        String name = extractUserName(token);
-        if (!name.equals(userDetails.getUsername())) {
+        try {
+            String username = extractUserName(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (Exception e) {
             return false;
         }
-        return !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -75,7 +83,7 @@ public class JwtService {
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails, EXPIRATION_REFRESH_TIME);
+        return generateToken(new HashMap<>(), userDetails, expirationRefreshTime);
     }
 
 
